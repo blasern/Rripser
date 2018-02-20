@@ -6,15 +6,15 @@
 using namespace Rcpp;
 
 // run_ripser
-Rcpp::NumericMatrix run_ripser(Rcpp::NumericMatrix dist_mat, int dim, double threshold);
-RcppExport SEXP _Rripser_run_ripser(SEXP dist_matSEXP, SEXP dimSEXP, SEXP thresholdSEXP) {
+Rcpp::NumericMatrix run_ripser(Rcpp::NumericVector dist_vec, int dim, double threshold);
+RcppExport SEXP _Rripser_run_ripser(SEXP dist_vecSEXP, SEXP dimSEXP, SEXP thresholdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dist_mat(dist_matSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type dist_vec(dist_vecSEXP);
     Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
     Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_ripser(dist_mat, dim, threshold));
+    rcpp_result_gen = Rcpp::wrap(run_ripser(dist_vec, dim, threshold));
     return rcpp_result_gen;
 END_RCPP
 }

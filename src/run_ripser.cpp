@@ -707,114 +707,21 @@ template <typename T> T read(std::istream& s) {
 	return result; // on little endian: boost::endian::little_to_native(result);
 }
 
-compressed_lower_distance_matrix read_point_cloud(std::istream& input_stream) {
-	std::vector<std::vector<value_t>> points;
-
-	std::string line;
-	value_t value;
-	while (std::getline(input_stream, line)) {
-		std::vector<value_t> point;
-		std::istringstream s(line);
-		while (s >> value) {
-			point.push_back(value);
-			s.ignore();
-		}
-		if (!point.empty()) points.push_back(point);
-		assert(point.size() == points.front().size());
-	}
-
-	euclidean_distance_matrix eucl_dist(std::move(points));
-
-	index_t n = eucl_dist.size();
-
-	// std::cout << "point cloud with " << n << " points in dimension " << eucl_dist.points.front().size() << std::endl;
-
-	std::vector<value_t> distances;
-
-	for (int i = 0; i < n; ++i)
-		for (int j = 0; j < i; ++j) distances.push_back(eucl_dist(i, j));
-
-	return compressed_lower_distance_matrix(std::move(distances));
-}
-
-compressed_lower_distance_matrix read_lower_distance_matrix(std::istream& input_stream) {
-	std::vector<value_t> distances;
-	value_t value;
-	while (input_stream >> value) {
-		distances.push_back(value);
-		input_stream.ignore();
-	}
-
-	return compressed_lower_distance_matrix(std::move(distances));
-}
-
-compressed_lower_distance_matrix read_upper_distance_matrix(std::istream& input_stream) {
-	std::vector<value_t> distances;
-	value_t value;
-	while (input_stream >> value) {
-		distances.push_back(value);
-		input_stream.ignore();
-	}
-
-	return compressed_lower_distance_matrix(compressed_upper_distance_matrix(std::move(distances)));
-}
-
-compressed_lower_distance_matrix read_distance_matrix(std::istream& input_stream) {
-	std::vector<value_t> distances;
-
-	std::string line;
-	value_t value;
-	for (int i = 0; std::getline(input_stream, line); ++i) {
-		std::istringstream s(line);
-		for (int j = 0; j < i && s >> value; ++j) {
-			distances.push_back(value);
-			s.ignore();
-		}
-	}
-
-	return compressed_lower_distance_matrix(std::move(distances));
-}
-
-void print_usage_and_exit(int exit_code) {
-	Rcpp::stop("Something went wrong");
-}
-
 // [[Rcpp::plugins(cpp11)]]
-compressed_lower_distance_matrix read_distance_matrix(Rcpp::NumericMatrix dist_mat) {
-  int nrow = dist_mat.nrow();
-  int ncol = dist_mat.ncol();
+compressed_lower_distance_matrix read_lower_distance_matrix(Rcpp::NumericVector dist_vec) {
+  int nrow = dist_vec.size();
   
   std::vector<value_t> distances;
   
   for (int i = 0; i < nrow; ++i) {
-    for (int j = 0; j < i; ++j) {
-      distances.push_back(dist_mat(i, j));
-    }
+    distances.push_back(dist_vec(i));
   }
   
-  return compressed_lower_distance_matrix(std::move(distances));
+  return compressed_lower_distance_matrix(compressed_upper_distance_matrix(std::move(distances)));
 }
 
-//' Ripser
-//' 
-//' Run ripser 
-//' 
-//' @param dist_mat distance matrix
-//' @param dim compute persistent homology up to this dimension 
-//' @param threshold compute Rips complex up to this diameter
-//' @examples
-//' rcircle <- function(N, r = 1, sd = 0){
-//' radius <- rnorm(N, r, sd)
-//' angle <- runif(N, 0, 2*pi)
-//' data.frame(x = radius * cos(angle), 
-//'            y = radius * sin(angle))
-//' }
-//' dta <- rcircle(200, sd = 0.1)
-//' dmat <- as.matrix(dist(dta))
-//' pers <- run_ripser(dmat, dim = 2)
-//' @export
 // [[Rcpp::export]]
-Rcpp::NumericMatrix run_ripser(Rcpp::NumericMatrix dist_mat, 
+Rcpp::NumericMatrix run_ripser(Rcpp::NumericVector dist_vec, 
                                int dim = 1, 
                                double threshold = NA_REAL) {
   bool verbose = false;
@@ -826,7 +733,7 @@ Rcpp::NumericMatrix run_ripser(Rcpp::NumericMatrix dist_mat,
   const coefficient_t modulus = 2;
   
   // extract distance matrix
-  compressed_lower_distance_matrix dist = read_distance_matrix(dist_mat);
+  compressed_lower_distance_matrix dist = read_lower_distance_matrix(dist_vec);
   
   index_t n = dist.size();
 
