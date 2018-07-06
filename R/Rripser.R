@@ -29,9 +29,12 @@ ripser <- function(dist_mat, dim = 1, threshold = NA_real_){
 }
 #' @export
 ripser.matrix <- function(dist_mat, dim = 1, threshold = NA_real_){
+  stopifnot(all(dim(dist_mat) > 1))
+  stopifnot(nrow(dist_mat) == ncol(dist_mat))
   ripser(stats::as.dist(dist_mat), dim = dim, threshold = threshold)
 }
 #' @export
 ripser.dist <- function(dist_mat, dim = 1, threshold = NA_real_){
+  stopifnot(length(dist_mat) > 0)
   run_ripser(dist_mat, dim = dim, threshold = threshold)
 }
