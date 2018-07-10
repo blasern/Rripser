@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/blasern/Rripser.svg?branch=master)](https://travis-ci.org/blasern/Rripser)
+
 # Rripser
 
 Rripser is an interface to directly call [ripser](https://github.com/Ripser/ripser) from R. 
