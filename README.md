@@ -2,7 +2,7 @@
 
 # Rripser
 
-Rripser is an interface to directly call [ripser](https://github.com/Ripser/ripser) from R. 
+Rripser is an interface to directly call [ripser](https://github.com/Ripser/ripser) from R. See also [TDAstats](https://github.com/rrrlw/TDAstats) for a more recent R interface to [ripser](https://github.com/Ripser/ripser) that includes some additional tools for the analysis of persistence diagrams. 
 
 ## Installation 
 
